@@ -7,7 +7,7 @@ services:
       - /opt/splunk/var
 
 #  splunkenterprise:
-#    image: splunk/splunk:6.5.0-monitor
+#    image: splunk/splunk:6.5.0
 #    environment:
 #      SPLUNK_START_ARGS: --accept-license --answer-yes
 #      SPLUNK_ENABLE_LISTEN: 9997
@@ -25,7 +25,7 @@ services:
 #      - 8088
 #      - 1514
   splunkdeploymentserver:
-    image: splunk/splunk:6.5.0-monitor
+    image: splunk/splunk:6.5.0
     environment:
       SPLUNK_START_ARGS: --accept-license --answer-yes
       SPLUNK_USER: root
@@ -36,14 +36,14 @@ services:
       - 8089
 
   splunkenterprise:
-    image: splunk/splunk:6.5.0-monitor
+    image: splunk/splunk:6.5.0
     environment:
       SPLUNK_START_ARGS: --accept-license --answer-yes
       SPLUNK_ENABLE_LISTEN: 9997
       SPLUNK_ADD: tcp 1514
       SPLUNK_USER: root
-    volumes_from:
-      - vsplunk
+    # volumes_from:
+    #   - vsplunk
     ports:
       - "8000:8000"
     expose:
@@ -56,9 +56,10 @@ services:
       - /opt/splunk/var
 
   splunkuniversalforwarder:
-    image: splunk/universalforwarder:6.5.0-monitor
+    image: splunk/universalforwarder:6.5.0
     links:
       - splunkenterprise
+      - splunkdeploymentserver
     environment:
       SPLUNK_START_ARGS: --accept-license --answer-yes
       SPLUNK_ADD: udp 1514
