@@ -1,0 +1,75 @@
+version: "2.0"
+services:
+  vsplunk:
+    image: busybox
+    volumes:
+      - /opt/splunk/etc
+      - /opt/splunk/var
+
+#  splunkenterprise:
+#    image: splunk/splunk:6.5.0-monitor
+#    environment:
+#      SPLUNK_START_ARGS: --accept-license --answer-yes
+#      SPLUNK_ENABLE_LISTEN: 9997
+#      SPLUNK_ADD: tcp 1514
+#      SPLUNK_USER: root
+#    volumes_from:
+#      - vsplunk
+#  #  volumes:
+#  #     - /var/lib/docker/containers:/host/containers:ro
+#  #    - /var/run/docker.sock:/var/run/docker.sock:ro
+#    ports:
+#      - "8000:8000"
+#    expose:
+#      - 9997
+#      - 8088
+#      - 1514
+  splunkdeploymentserver:
+    image: splunk/splunk:6.5.0-monitor
+    environment:
+      SPLUNK_START_ARGS: --accept-license --answer-yes
+      SPLUNK_USER: root
+      SPLUNK_ENABLE_DEPLOY_SERVER : "true"
+    ports:
+      - "8800:8000"
+    expose:
+      - 8089
+
+  splunkenterprise:
+    image: splunk/splunk:6.5.0-monitor
+    environment:
+      SPLUNK_START_ARGS: --accept-license --answer-yes
+      SPLUNK_ENABLE_LISTEN: 9997
+      SPLUNK_ADD: tcp 1514
+      SPLUNK_USER: root
+    volumes_from:
+      - vsplunk
+    ports:
+      - "8000:8000"
+    expose:
+      - 9997
+
+  vsplunk_uf:
+    image: busybox
+    volumes:
+      - /opt/splunk/etc
+      - /opt/splunk/var
+
+  splunkuniversalforwarder:
+    image: splunk/universalforwarder:6.5.0-monitor
+    links:
+      - splunkenterprise
+    environment:
+      SPLUNK_START_ARGS: --accept-license --answer-yes
+      SPLUNK_ADD: udp 1514
+      SPLUNK_FORWARD_SERVER: splunkenterprise:9997
+      SPLUNK_DEPLOYMENT_SERVER: splunkdeploymentserver:8089
+      SPLUNK_USER: root
+      restart: always
+#    volumes_from:
+#      - vsplunk_uf
+    #volumes:
+    #  - /var/lib/docker/containers:/host/containers:ro
+    #  - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "5514:1514/udp"
