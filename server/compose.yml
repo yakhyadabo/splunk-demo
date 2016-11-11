@@ -30,7 +30,6 @@ services:
     image: splunk/universalforwarder:6.5.0
     links:
       - splunkenterprise
-      - splunkdeploymentserver
     environment:
       SPLUNK_START_ARGS: --accept-license --answer-yes
       SPLUNK_ADD: udp 1514
