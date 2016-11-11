@@ -13,8 +13,8 @@ services:
       SPLUNK_ENABLE_LISTEN: 9997
       SPLUNK_ADD: tcp 1514
       SPLUNK_USER: root
-    # volumes_from:
-    #   - vsplunk
+    volumes_from:
+      - vsplunk
     ports:
       - "8000:8000"
     expose:
@@ -37,7 +37,7 @@ services:
       SPLUNK_FORWARD_SERVER: splunkenterprise:9997
       SPLUNK_USER: root
       restart: always
-#    volumes_from:
-#      - vsplunk_uf
+    volumes_from:
+      - vsplunk_uf
     ports:
       - "5514:1514/udp"
